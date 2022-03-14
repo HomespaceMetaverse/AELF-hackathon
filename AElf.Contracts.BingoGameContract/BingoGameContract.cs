@@ -117,20 +117,8 @@ namespace AElf.Contracts.BingoGameContract
                 State.ConsensusContract.Value =
                     Context.GetContractAddressByName(SmartContractConstants.ConsensusContractSystemName);
             }
-
-            var randomHash = State.ConsensusContract.GetRandomHash.Call(new Int64Value
-            {
-                Value = targetHeight
-            });
-            if (randomHash == null)
-            {
-                throw new AssertionException("Still preparing your game result, please wait for a while :)");
-            }
-
-            var usefulHash = HashHelper.ConcatAndCompute(randomHash, playerInformation.Seed);
-            var bitArraySum = SumHash(usefulHash);
-            var isWin = State.Winner.Value == Context.Sender; //.Value
-            var award = CalculateAward(boutInformation.Amount, GetKind(bitArraySum));
+            var isWin = State.Winner.Value == Context.Sender; 
+            var award = CalculateAward(boutInformation.Amount, 4);
             award = isWin ? award : award;
             var transferAmount = boutInformation.Amount.Add(award);
             if (transferAmount > 0)
@@ -151,7 +139,7 @@ namespace AElf.Contracts.BingoGameContract
         }
 
         public override Int64Value SetWinner(Address address) {
-            Assert(Context.Sender == State.Admin.Value, "No permission to prepare!");
+            Assert(Context.Sender == State.Admin.Value, "No permission to SetWinner!");
 
             State.Winner.Value = address;
             return new Int64Value {Value = 0};
